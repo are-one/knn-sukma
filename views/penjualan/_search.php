@@ -19,9 +19,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'tahun_bulan_id') ?>
 
-    <?= $form->field($model, 'jenis_donat_id') ?>
-
-    <?= $form->field($model, 'jumlah_penjualan') ?>
+    <?= $form->field($model, 'label') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>

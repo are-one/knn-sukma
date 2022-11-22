@@ -1,5 +1,6 @@
 <?php
 
+use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\bootstrap5\ActiveForm;
 
@@ -20,14 +21,20 @@ $list_bulan = [
     'Oktober' => 'Oktober',
     'November' => 'November',
     'Desember' => 'Desember',
-]
+];
 ?>
 
 <div class="tahun-bulan-form">
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'bulan')->dropDownList($list_bulan, ['prompt' => 'Pilih bulan...']) ?>
+    <?= $form->field($model, 'bulan')->widget(Select2::class,[
+        'data' => $list_bulan,
+        'options' => ['placeholder' => 'Pilih bulan ...'],
+        'pluginOptions' => [
+            'allowClear' => true,
+        ],
+    ])->label('Jenis Donat') ?>
     
     <?= $form->field($model, 'tahun')->textInput() ?>
 

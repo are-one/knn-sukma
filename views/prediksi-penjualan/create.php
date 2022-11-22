@@ -5,8 +5,8 @@ use yii\helpers\Html;
 /** @var yii\web\View $this */
 /** @var app\models\PrediksiPenjualan $model */
 
-$this->title = 'Create Prediksi Penjualan';
-$this->params['breadcrumbs'][] = ['label' => 'Prediksi Penjualans', 'url' => ['index']];
+$this->title = 'Masukkan Data Penjualan';
+$this->params['breadcrumbs'][] = ['label' => 'Prediksi Penjualan', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="prediksi-penjualan-create">
@@ -15,6 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= $this->render('_form', [
         'model' => $model,
+        'modelDataPrediksi' => $modelDataPrediksi,
     ]) ?>
 
 </div>

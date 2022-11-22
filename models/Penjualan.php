@@ -9,10 +9,10 @@ use Yii;
  *
  * @property int $id
  * @property int $tahun_bulan_id
- * @property int $jenis_donat_id
- * @property int $jumlah_penjualan
+ * @property string $label
  *
- * @property JenisDonat $jenisDonat
+ * @property JenisDonatHasPenjualan[] $jenisDonatHasPenjualans
+ * @property JenisDonat[] $jenisDonats
  * @property TahunBulan $tahunBulan
  */
 class Penjualan extends \yii\db\ActiveRecord
@@ -31,9 +31,9 @@ class Penjualan extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['tahun_bulan_id', 'jenis_donat_id'], 'required'],
-            [['tahun_bulan_id', 'jenis_donat_id', 'jumlah_penjualan'], 'integer'],
-            [['jenis_donat_id'], 'exist', 'skipOnError' => true, 'targetClass' => JenisDonat::class, 'targetAttribute' => ['jenis_donat_id' => 'id']],
+            [['tahun_bulan_id', 'label'], 'required'],
+            [['tahun_bulan_id'], 'integer'],
+            [['label'], 'string', 'max' => 20],
             [['tahun_bulan_id'], 'exist', 'skipOnError' => true, 'targetClass' => TahunBulan::class, 'targetAttribute' => ['tahun_bulan_id' => 'id']],
         ];
     }
@@ -46,19 +46,28 @@ class Penjualan extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'tahun_bulan_id' => 'Tahun Bulan ID',
-            'jenis_donat_id' => 'Jenis Donat ID',
-            'jumlah_penjualan' => 'Jumlah Penjualan',
+            'label' => 'Label',
         ];
     }
 
     /**
-     * Gets query for [[JenisDonat]].
+     * Gets query for [[JenisDonatHasPenjualans]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getJenisDonat()
+    public function getJenisDonatHasPenjualans()
     {
-        return $this->hasOne(JenisDonat::class, ['id' => 'jenis_donat_id']);
+        return $this->hasMany(JenisDonatHasPenjualan::class, ['penjualan_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[JenisDonats]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getJenisDonats()
+    {
+        return $this->hasMany(JenisDonat::class, ['id' => 'jenis_donat_id'])->viaTable('jenis_donat_has_penjualan', ['penjualan_id' => 'id']);
     }
 
     /**

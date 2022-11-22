@@ -31,8 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'id',
             'tahun_bulan_id',
-            'jenis_donat_id',
-            'jumlah_penjualan',
+            'label',
         ],
     ]) ?>
 

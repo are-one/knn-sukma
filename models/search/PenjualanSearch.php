@@ -17,7 +17,8 @@ class PenjualanSearch extends Penjualan
     public function rules()
     {
         return [
-            [['id', 'tahun_bulan_id', 'jenis_donat_id', 'jumlah_penjualan'], 'integer'],
+            [['id', 'tahun_bulan_id'], 'integer'],
+            [['label'], 'safe'],
         ];
     }
 
@@ -59,9 +60,9 @@ class PenjualanSearch extends Penjualan
         $query->andFilterWhere([
             'id' => $this->id,
             'tahun_bulan_id' => $this->tahun_bulan_id,
-            'jenis_donat_id' => $this->jenis_donat_id,
-            'jumlah_penjualan' => $this->jumlah_penjualan,
         ]);
+
+        $query->andFilterWhere(['like', 'label', $this->label]);
 
         return $dataProvider;
     }

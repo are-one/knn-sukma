@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\JenisDonat;
 use app\models\Penjualan;
 use app\models\search\PenjualanSearch;
 use yii\web\Controller;
@@ -41,7 +42,11 @@ class PenjualanController extends Controller
         $searchModel = new PenjualanSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
+        $jenisDonat = JenisDonat::find()->all();
+
+
         return $this->render('index', [
+            'jenisDonat' => $jenisDonat,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -71,7 +76,7 @@ class PenjualanController extends Controller
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+                return $this->redirect(['index']);
             }
         } else {
             $model->loadDefaultValues();
@@ -94,7 +99,7 @@ class PenjualanController extends Controller
         $model = $this->findModel($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         }
 
         return $this->render('update', [
