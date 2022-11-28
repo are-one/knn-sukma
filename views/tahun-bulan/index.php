@@ -10,7 +10,7 @@ use yii\grid\GridView;
 /** @var app\models\search\TahunBulanSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = 'Tahun Bulans';
+$this->title = 'Tahun Bulan';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="tahun-bulan-index">
@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create Tahun Bulan', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Tambah Tahun Bulan', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>

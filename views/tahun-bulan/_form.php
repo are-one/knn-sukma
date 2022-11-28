@@ -34,7 +34,7 @@ $list_bulan = [
         'pluginOptions' => [
             'allowClear' => true,
         ],
-    ])->label('Jenis Donat') ?>
+    ])->label('Bulan') ?>
     
     <?= $form->field($model, 'tahun')->textInput() ?>
 
