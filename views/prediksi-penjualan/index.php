@@ -66,7 +66,7 @@ $icons = (new ActionColumn())->icons;
                                                     <tr>
                                                         <td><?= $jp->jumlah_penjualan ?></td>
                                                         <td width="4%">
-                                                            <?= Html::a($icons['trash'], ['delete-jumlah-penjualan','id' => $jp->id], ['data' => [
+                                                            <?= Html::a($icons['trash'], ['prediksi-penjualan/delete-jumlah-penjualan','id' => $jp->id], ['data' => [
                                                                                     'method' => 'post',
                                                                                     'confirm' => 'Are you sure you want to delete this item?',
                                                                                 ]
