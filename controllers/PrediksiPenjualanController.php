@@ -3,12 +3,14 @@
 namespace app\controllers;
 
 use app\models\JenisDonat;
+use app\models\JenisDonatHasPenjualan;
 use app\models\JenisDonatHasPrediksiPenjualan;
 use app\models\Penjualan;
 use app\models\PrediksiPenjualan;
 use app\models\search\PrediksiPenjualanSearch;
 use Phpml\Classification\KNearestNeighbors;
 use Phpml\Math\Distance\Euclidean;
+use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -76,29 +78,88 @@ class PrediksiPenjualanController extends Controller
      */
     public function actionCreate()
     {
-        $modelDataPrediksi = new JenisDonatHasPrediksiPenjualan();
-        $model = new PrediksiPenjualan();
+        try {
+            $transaction = Yii::$app->db->beginTransaction();
+    
+            $modelDataPrediksi = new JenisDonatHasPrediksiPenjualan();
+            $model = new PrediksiPenjualan();
+    
+            if ($this->request->isPost) {
+    
+                if ($model->load($this->request->post()) && $modelDataPrediksi->load($this->request->post())) {
+                    $jumlah_penjualan = $this->request->post($modelDataPrediksi->formName())['jumlah_penjualan'];
+                    $dataPrediksi =  $this->request->post($modelDataPrediksi->formName());
+    
+                    $data_jumlah_penjualan = $dataPrediksi['jumlah_penjualan'];
+                    $jenis_donat_id = $dataPrediksi['jenis_donat_id'];
 
-        if ($this->request->isPost) {
+                    if(array_sum($data_jumlah_penjualan) < 1){
+                        Yii::$app->session->setFlash('error', 'Tidak ada data yang ditambahkan');
+                        return $this->redirect(['index']);
+                    }
 
-            if ($model->load($this->request->post()) && $modelDataPrediksi->load($this->request->post())) {
-                $jumlah_penjualan = $this->request->post($modelDataPrediksi->formName())['jumlah_penjualan'];
-
-                $this->prediksi($jumlah_penjualan, $modelDataPrediksi->jenis_donat_id,3);
-
-                // $model->save();
-                // return $this->redirect(['view', 'id' => $model->id]);
+                    $model->hasil_prediksi = $this->prediksi($data_jumlah_penjualan, $jenis_donat_id,3);
+    
+                    if($model->save()){
+    
+                        $hasSaved = true;
+                        $banyak_data = 0;
+    
+                        foreach ($data_jumlah_penjualan as $_ => $jumlah_penjualan) {
+                            if($jumlah_penjualan == 0) continue;
+    
+                            $banyak_data++;
+                            $jenisDonatHasPrediksiPenjualan = new JenisDonatHasPrediksiPenjualan();
+                            $jenisDonatHasPrediksiPenjualan->prediksi_penjualan_id = $model->id;
+                            $jenisDonatHasPrediksiPenjualan->jenis_donat_id = $jenis_donat_id;
+                            $jenisDonatHasPrediksiPenjualan->jumlah_penjualan = $jumlah_penjualan;
+    
+                            if(!$jenisDonatHasPrediksiPenjualan->save()){
+                                print_r($jenisDonatHasPrediksiPenjualan->getErrors());die;
+                                $hasSaved = false;
+                                break;
+                            }
+                        }
+    
+                        if($banyak_data < 1){
+                            $hasSaved = false;
+                        }
+    
+                        if(!$hasSaved){
+                            $transaction->rollBack();
+                            if($banyak_data < 1){
+                                Yii::$app->session->setFlash('error', 'Tidak ada data yang ditambahkan');
+                            }else{
+                                Yii::$app->session->setFlash('error', 'Data gagal ditambahkan');
+                            }
+                        }else{
+                            $transaction->commit();
+                            Yii::$app->session->setFlash('success', 'Data berhasil ditambahkan');
+                            return $this->redirect(['index']);
+                        }
+    
+                    }else{
+                        print_r($model->getErrors());die;
+                        $transaction->rollBack();
+                    }
+    
+                    return $this->redirect(['index']);
+                }
+    
+            } else {
+                $model->loadDefaultValues();
+                $modelDataPrediksi->loadDefaultValues();
             }
+    
+            return $this->render('create', [
+                'model' => $model,
+                'modelDataPrediksi' => $modelDataPrediksi,
+            ]);
 
-        } else {
-            $model->loadDefaultValues();
-            $modelDataPrediksi->loadDefaultValues();
+        } catch (\Throwable $th) {
+            $transaction->rollBack();
+            throw new ServerErrorHttpException('Terjadi masalah : '.$th->getLine(). ' - '. $th->getMessage());
         }
-
-        return $this->render('create', [
-            'model' => $model,
-            'modelDataPrediksi' => $modelDataPrediksi,
-        ]);
     }
 
     /**
@@ -158,31 +219,56 @@ class PrediksiPenjualanController extends Controller
             
             $sample = [];
             
-            $penjualan_donat = Penjualan::findAll(['jenis_donat_id' => $id_jenis_donat]);
+            $penjualan_donat = Penjualan::find()->joinWith(['jenisDonatHasPenjualans jp'])->where(['jp.jenis_donat_id' => $id_jenis_donat])->all();
             
-            print_r($penjualan_donat);die;
-        // $sample = [
-        //     [1000,2908,4550,1278,100,50,124,50],
-        //     [300,2908,4550,1278,100,50,124,50],
-        //     [500,2908,5000,1278,100,50,124,50],
-        //     [611,2819,2732,1198,45,15,32,12],
-        //     [500,4311,3870,1450,55,30,45,20],
-        //     [300,2908,4550,1278,100,124,0,0],
-        //     [300,2908,4550,1278,100,45,100,37],
-        //     [300,2908,4550,1278,100,45,100,37],
-        //     [300,2908,4550,1278,100,45,100,37],
-        //     [300,2908,4550,1278,100,50,124,50],
-        //     [600,2908,4550,1278,100,50,124,50]
-        // ];
 
-        // $lable = [10060,9360,10010,7464,10281,9260,9318,9318,9318,9360,9660,918,3867,4949];
-        // $lables = ['Terbanyak','Sedikit','Terbanyak','Sedikit','Terbanyak','Sedikit','Sedikit','Sedikit','Sedikit','Sedikit','Sedikit'];
-        // $knn->train($sample, $lables);
+            $sample = [];
+            $lables = [];
 
-        // echo $knn->predict([3002,5210,5444,3892,2389,602,1008,430]);die;
+            foreach ($penjualan_donat as $no_sample => $dp) {
+                $data_jumlah_penjualan = $dp->jenisDonatHasPenjualans;
+                for ($i=0; $i < 10; $i++) { 
+                    $sample[$no_sample][] = isset($data_jumlah_penjualan[$i])? $data_jumlah_penjualan[$i]->jumlah_penjualan : 0;
+                }
+                $lables[$no_sample] = $dp->label;
+            }
+
+        $knn->train($sample, $lables);
+
+        return $knn->predict($data);
+
         } catch (\Throwable $th) {
             throw new ServerErrorHttpException('Terjadi masalah: '.$th->getLine().' - '. $th->getMessage());
         }
 
+    }
+
+    public function actionDeleteJumlahPenjualan($id)
+    {
+        try {
+            $jenisDonatHasPrediksiPenjualan = JenisDonatHasPrediksiPenjualan::findOne(['id' => $id]);
+            $prediksi_penjualan_id = $jenisDonatHasPrediksiPenjualan->prediksi_penjualan_id;
+
+            // Hitung jumlah data
+            $jumlah_data = JenisDonatHasPrediksiPenjualan::find()->where(['prediksi_penjualan_id' => $prediksi_penjualan_id])->count();
+            
+            if($jenisDonatHasPrediksiPenjualan->delete()){
+                Yii::$app->session->setFlash('success', 'Data penjualan berhasil dihapus');
+            }else{
+                Yii::$app->session->setFlash('error', 'Data penjualan gagal dihapus');
+            }
+
+            // Jika tersisa 1 maka hapus data Penjualan
+            if($jumlah_data == 1){
+                $modelPrediksiPenjualan = PrediksiPenjualan::findOne(['id' => $prediksi_penjualan_id]);
+                $modelPrediksiPenjualan->delete();
+            }
+
+            return $this->redirect(['index']);
+            
+        } catch (\Throwable $th) {
+            throw new ServerErrorHttpException('Terjadi masalah: '. $th->getMessage());
+        }
+        
     }
 }

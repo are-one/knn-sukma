@@ -13,6 +13,9 @@ use yii\grid\GridView;
 
 $this->title = 'Hasil Prediksi Penjualan';
 $this->params['breadcrumbs'][] = $this->title;
+
+$icons = (new ActionColumn())->icons;
+
 ?>
 <div class="prediksi-penjualan-index">
 
@@ -38,10 +41,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?php 
                     $i = 1;
 
-                        foreach ($jenisDonat as $_ => $donat) {
-                            $penjualan = PrediksiPenjualan::find()->select('tahun_bulan_id')->distinct()->orderBy(['tahun_bulan_id' => SORT_ASC])->all();
-                            $jumlahPenjualan = null;
-                            if($penjualan != null){
+                    foreach ($jenisDonat as $_ => $donat) {
+                        $penjualan = PrediksiPenjualan::find()->joinWith(['jenisDonatHasPrediksiPenjualans'])->select('tahun_bulan_id, prediksi_penjualan.id, prediksi_penjualan.hasil_prediksi')->distinct()->where(['jenis_donat_has_prediksi_penjualan.jenis_donat_id' => $donat->id])->orderBy(['tahun_bulan_id' => SORT_ASC])->all();
+                        $jumlahPenjualan = null;
+                        if($penjualan != null){
                             
                     ?>
                     <tr>
@@ -51,42 +54,51 @@ $this->params['breadcrumbs'][] = $this->title;
                             <table class="table table-bordered mb-0" width="100%">
                                 <?php
                                 foreach ($penjualan as $_ => $p) {
-                                    $jumlahPenjualan = JenisDonatHasPrediksiPenjualan::find()->where(['jenis_donat_id' => $donat->id, 'prediksi_penjualan_id' => $p->id])->orderBy(['tahun_bulan_id' => SORT_ASC])->all();
-                                    
+                                    $jumlahPenjualan = JenisDonatHasPrediksiPenjualan::find()->joinWith(['prediksiPenjualan'])->where(['jenis_donat_id' => $donat->id, 'prediksi_penjualan_id' => $p->id])->orderBy(['prediksi_penjualan.tahun_bulan_id' => SORT_ASC])->all();
                                 ?>
                                     <tr>
                                         <td width="45%"><?= $p->tahunBulan->bulan . ' - '. $p->tahunBulan->tahun ?></td>
                                         <td class="p-0">
-                                        <table class="table table-bordered mb-0">
-                                            <?php
-                                            foreach ($jumlahPenjualan as $_ => $jp) {    
-                                            ?>
-                                                <tr>
-                                                    <td><?= $jp->jumlah_penjualan ?></td>
-                                                </tr>
-                                            <?php 
-                                                } 
-                                            ?>
-                                        </table>
+                                            <table class="table table-bordered mb-0">
+                                                <?php
+                                                foreach ($jumlahPenjualan as $_ => $jp) {    
+                                                ?>
+                                                    <tr>
+                                                        <td><?= $jp->jumlah_penjualan ?></td>
+                                                        <td width="4%">
+                                                            <?= Html::a($icons['trash'], ['delete-jumlah-penjualan','id' => $jp->id], ['data' => [
+                                                                                    'method' => 'post',
+                                                                                    'confirm' => 'Are you sure you want to delete this item?',
+                                                                                ]
+                                                                            ]) ?>
+                                                        </td>
+                                                    </tr>
+                                                <?php 
+                                                    } 
+                                                ?>
+                                            </table>
+                                        </td>
+                                        <td class="text-center">
+                                            <?= $p->hasil_prediksi ?>
                                         </td>
                                     </tr>
-                                <?php 
+                                    <?php 
                                     } 
-                                ?>
+                                    ?>
                             </table>
                         </td>
                     </tr>
                     <?php 
-                                $i++;
-                            }else{
-                    ?>
-                            <tr>
-                                <td class="text-center" colspan="4">
-                                    <i class="text-muted">Data tidak ditemukan</i>
-                                </td>
-                            </tr>
-                    <?php
-                        }
+                            $i++;
+                        }else{
+                            ?>
+                                    <tr>
+                                        <td class="text-center" colspan="4">
+                                            <i class="text-muted">Data tidak ditemukan</i>
+                                        </td>
+                                    </tr>
+                            <?php
+                                }
                     }
                     ?>
                 </tbody>
