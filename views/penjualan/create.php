@@ -5,8 +5,8 @@ use yii\helpers\Html;
 /** @var yii\web\View $this */
 /** @var app\models\Penjualan $model */
 
-$this->title = 'Create Penjualan';
-$this->params['breadcrumbs'][] = ['label' => 'Penjualans', 'url' => ['index']];
+$this->title = 'Tambah Data Training';
+$this->params['breadcrumbs'][] = ['label' => 'Penjualan', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="penjualan-create">
@@ -15,6 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= $this->render('_form', [
         'model' => $model,
+        'modelJenisDonatHasPenjualan' => $modelJenisDonatHasPenjualan,
     ]) ?>
 
 </div>

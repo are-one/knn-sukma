@@ -3,11 +3,15 @@
 namespace app\controllers;
 
 use app\models\JenisDonat;
+use app\models\JenisDonatHasPenjualan;
+use app\models\JenisDonatHasPrediksiPenjualan;
 use app\models\Penjualan;
 use app\models\search\PenjualanSearch;
+use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\ServerErrorHttpException;
 
 /**
  * PenjualanController implements the CRUD actions for Penjualan model.
@@ -26,6 +30,7 @@ class PenjualanController extends Controller
                     'class' => VerbFilter::className(),
                     'actions' => [
                         'delete' => ['POST'],
+                        'delete-jumlah-penjualan' => ['POST'],
                     ],
                 ],
             ]
@@ -72,19 +77,83 @@ class PenjualanController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Penjualan();
+        try {
+            $transaction = Yii::$app->db->beginTransaction();
+            
+            $model = new Penjualan();
+            $modelJenisDonatHasPenjualan = new JenisDonatHasPenjualan();
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['index']);
+
+            if ($this->request->isPost) {
+                
+                if ($model->load($this->request->post()) && $modelJenisDonatHasPenjualan->load($this->request->post())) {
+                    $postJenisDonatHasPenjualan =  $this->request->post($modelJenisDonatHasPenjualan->formName());
+                    $dataJumlahPenjualan = $postJenisDonatHasPenjualan['jumlah_penjualan'];
+                    $jenis_donat_id = $postJenisDonatHasPenjualan['jenis_donat_id'];
+                    
+                    $modelLama = Penjualan::findOne(['tahun_bulan_id' => $model->tahun_bulan_id]);
+                    $modelLama->label = $model->label;
+                    $model = ( $modelLama != null)? $modelLama : $model;
+
+                    if($model->save()){
+
+                        $hasSaved = true;
+                        $banyak_data = 0;
+
+                        foreach ($dataJumlahPenjualan as $_ => $jumlah_penjualan) {
+                            if($jumlah_penjualan == 0) continue;
+
+                            $banyak_data++;
+                            $jenisDonatHasPenjualan = new JenisDonatHasPenjualan();
+                            $jenisDonatHasPenjualan->penjualan_id = $model->id;
+                            $jenisDonatHasPenjualan->jenis_donat_id = $jenis_donat_id;
+                            $jenisDonatHasPenjualan->jumlah_penjualan = $jumlah_penjualan;
+
+                            if(!$jenisDonatHasPenjualan->save()){
+                                print_r($jenisDonatHasPenjualan->getErrors());die;
+                                $hasSaved = false;
+                                break;
+                            }
+                        }
+
+                        if($banyak_data < 1){
+                            $hasSaved = false;
+                        }
+
+                        if(!$hasSaved){
+                            $transaction->rollBack();
+                            if($banyak_data < 1){
+                                Yii::$app->session->setFlash('error', 'Tidak ada data yang ditambahkan');
+                            }else{
+                                Yii::$app->session->setFlash('error', 'Data gagal ditambahkan');
+                            }
+                        }else{
+                            $transaction->commit();
+                            Yii::$app->session->setFlash('success', 'Data berhasil ditambahkan');
+                            return $this->redirect(['index']);
+                        }
+
+                    }else{
+                        $transaction->rollBack();
+                    }
+                    
+                    return $this->redirect(['index']);
+                }
+            } else {
+                $model->loadDefaultValues();
+                $modelJenisDonatHasPenjualan->loadDefaultValues();
             }
-        } else {
-            $model->loadDefaultValues();
-        }
 
-        return $this->render('create', [
-            'model' => $model,
-        ]);
+            return $this->render('create', [
+                'model' => $model,
+                'modelJenisDonatHasPenjualan' => $modelJenisDonatHasPenjualan,
+            ]);  
+
+        } catch (\Throwable $th) {
+            $transaction->rollBack();
+            throw new ServerErrorHttpException('Terjadi masalah : '.$th->getLine(). ' - '. $th->getMessage());
+        }
+        
     }
 
     /**
@@ -135,5 +204,35 @@ class PenjualanController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    public function actionDeleteJumlahPenjualan($id)
+    {
+        try {
+            $modelJenisDonatHasPenjualan = JenisDonatHasPenjualan::findOne(['id' => $id]);
+            $penjualan_id = $modelJenisDonatHasPenjualan->penjualan_id;
+
+            // Hitung jumlah data
+            $jumlah_data = JenisDonatHasPenjualan::find()->where(['penjualan_id' => $penjualan_id])->count();
+            
+            if($modelJenisDonatHasPenjualan->delete()){
+                Yii::$app->session->setFlash('success', 'Data penjualan berhasil dihapus');
+            }else{
+                Yii::$app->session->setFlash('error', 'Data penjualan gagal dihapus');
+            }
+
+            // Jika tersisa 1 maka hapus data Penjualan
+            if($jumlah_data == 1){
+                $modelPenjualan = Penjualan::findOne(['id' => $penjualan_id]);
+                $modelPenjualan->delete();
+            }
+
+            return $this->redirect(['index']);
+            
+        } catch (\Throwable $th) {
+            throw new ServerErrorHttpException('Terjadi masalah: '. $th->getMessage());
+        }
+
+        
     }
 }
