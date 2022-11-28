@@ -12,7 +12,6 @@ use Yii;
  * @property string $label
  *
  * @property JenisDonatHasPenjualan[] $jenisDonatHasPenjualans
- * @property JenisDonat[] $jenisDonats
  * @property TahunBulan $tahunBulan
  */
 class Penjualan extends \yii\db\ActiveRecord
@@ -58,16 +57,6 @@ class Penjualan extends \yii\db\ActiveRecord
     public function getJenisDonatHasPenjualans()
     {
         return $this->hasMany(JenisDonatHasPenjualan::class, ['penjualan_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[JenisDonats]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getJenisDonats()
-    {
-        return $this->hasMany(JenisDonat::class, ['id' => 'jenis_donat_id'])->viaTable('jenis_donat_has_penjualan', ['penjualan_id' => 'id']);
     }
 
     /**

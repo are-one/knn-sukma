@@ -7,6 +7,7 @@ use Yii;
 /**
  * This is the model class for table "jenis_donat_has_penjualan".
  *
+ * @property int $id
  * @property int $penjualan_id
  * @property int $jenis_donat_id
  * @property int $jumlah_penjualan
@@ -32,7 +33,6 @@ class JenisDonatHasPenjualan extends \yii\db\ActiveRecord
         return [
             [['penjualan_id', 'jenis_donat_id'], 'required'],
             [['penjualan_id', 'jenis_donat_id', 'jumlah_penjualan'], 'integer'],
-            [['penjualan_id', 'jenis_donat_id'], 'unique', 'targetAttribute' => ['penjualan_id', 'jenis_donat_id']],
             [['jenis_donat_id'], 'exist', 'skipOnError' => true, 'targetClass' => JenisDonat::class, 'targetAttribute' => ['jenis_donat_id' => 'id']],
             [['penjualan_id'], 'exist', 'skipOnError' => true, 'targetClass' => Penjualan::class, 'targetAttribute' => ['penjualan_id' => 'id']],
         ];
@@ -44,6 +44,7 @@ class JenisDonatHasPenjualan extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
+            'id' => 'ID',
             'penjualan_id' => 'Penjualan ID',
             'jenis_donat_id' => 'Jenis Donat ID',
             'jumlah_penjualan' => 'Jumlah Penjualan',
