@@ -57,7 +57,17 @@ $icons = (new ActionColumn())->icons;
                                     $jumlahPenjualan = JenisDonatHasPrediksiPenjualan::find()->joinWith(['prediksiPenjualan'])->where(['jenis_donat_id' => $donat->id, 'prediksi_penjualan_id' => $p->id])->orderBy(['prediksi_penjualan.tahun_bulan_id' => SORT_ASC])->all();
                                 ?>
                                     <tr>
-                                        <td width="45%"><?= $p->tahunBulan->bulan . ' - '. $p->tahunBulan->tahun ?></td>
+                                        <td width="45%">
+                                            <?= $p->tahunBulan->bulan . ' - '. $p->tahunBulan->tahun ?>
+                                            <?= Html::a($icons['trash'], ['prediksi-penjualan/delete','id' => $p->id], [
+                                                                        'class' => 'float-end',
+                                                                        'data' => [
+                                                                                    'method' => 'post',
+                                                                                    'confirm' => 'Menghapus data Tahun-Bulan akan menghapus seluruh data jumlah penjualan yang berkaitan data ini. Apakah anda yakin ingin?',
+                                                                                ]
+                                                                            ]) ?>
+                                        </td>
+
                                         <td class="p-0">
                                             <table class="table table-bordered mb-0">
                                                 <?php

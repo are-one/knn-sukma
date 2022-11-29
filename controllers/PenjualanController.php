@@ -185,9 +185,18 @@ class PenjualanController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+        try {
+            if(JenisDonatHasPenjualan::deleteAll(['penjualan_id' => $id])){
+                $this->findModel($id)->delete();
+                Yii::$app->session->setFlash('success', 'Data penjualan berhasil dihapus');
+            }else{
+                Yii::$app->session->setFlash('error', 'Data penjualan gagal dihapus');
+            }
+            
+            return $this->redirect(['index']);
+        } catch (\Throwable $th) {
+            throw new ServerErrorHttpException('Terjadi masalah: '.$th->getLine().' - '. $th->getMessage());
+        }
     }
 
     /**

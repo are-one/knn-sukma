@@ -191,9 +191,19 @@ class PrediksiPenjualanController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        try {
+            if(JenisDonatHasPrediksiPenjualan::deleteAll(['prediksi_penjualan_id' => $id])){
+                $this->findModel($id)->delete();
+                Yii::$app->session->setFlash('success', 'Data prediksi penjualan berhasil dihapus');
+            }else{
+                Yii::$app->session->setFlash('error', 'Data prediksi penjualan gagal dihapus');
+            }
 
-        return $this->redirect(['index']);
+            return $this->redirect(['index']);
+        } catch (\Throwable $th) {
+            throw new ServerErrorHttpException('Terjadi masalah: '.$th->getLine().' - '. $th->getMessage());
+        }
+
     }
 
     /**
