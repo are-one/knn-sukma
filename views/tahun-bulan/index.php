@@ -17,6 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
+    <hr>
     <p>
         <?= Html::a('Tambah Tahun Bulan', ['create'], ['class' => 'btn btn-success']) ?>
     </p>

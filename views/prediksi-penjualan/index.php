@@ -21,6 +21,7 @@ $icons = (new ActionColumn())->icons;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
+    <hr>
     <p>
         <?= Html::a('Prediksi Data Penjualan', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
@@ -88,11 +89,14 @@ $icons = (new ActionColumn())->icons;
                                                 ?>
                                             </table>
                                         </td>
-                                        <td class="text-center">
-                                            <?= $p->hasil_prediksi ?>
-                                        </td>
-                                    </tr>
-                                    <?php 
+                                        <td class="h-100">
+                                                <span class="d-flex align-items-end mb-3">
+                                                    <?= $p->hasil_prediksi ?>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                       
+                                        <?php 
                                     } 
                                     ?>
                             </table>
