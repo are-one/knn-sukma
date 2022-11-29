@@ -98,7 +98,13 @@ class PrediksiPenjualanController extends Controller
                         return $this->redirect(['index']);
                     }
 
-                    $model->hasil_prediksi = $this->prediksi($data_jumlah_penjualan, $jenis_donat_id,3);
+                    $prediksi = $this->prediksi($data_jumlah_penjualan, $jenis_donat_id,3);
+                    if(count($prediksi['data_training']) < 1){
+                        Yii::$app->session->setFlash('error','Data training tidak ditemukan');
+                        return $this->redirect(['index']);
+                    }else{
+                        $model->hasil_prediksi = $prediksi['result'];
+                    }
     
                     if($model->save()){
     
@@ -229,8 +235,10 @@ class PrediksiPenjualanController extends Controller
             
             $sample = [];
             
+            //mencari data training berdasarkan jenis donat
+            // $penjualan_donat = Penjualan::find()->joinWith(['jenisDonatHasPenjualans jp'])->where(['jp.jenis_donat_id' => $id_jenis_donat])->all();
+            //mangambil data training tanpa menperhatikan jenis donat
             $penjualan_donat = Penjualan::find()->joinWith(['jenisDonatHasPenjualans jp'])->where(['jp.jenis_donat_id' => $id_jenis_donat])->all();
-            
 
             $sample = [];
             $lables = [];
@@ -244,8 +252,8 @@ class PrediksiPenjualanController extends Controller
             }
 
         $knn->train($sample, $lables);
-
-        return $knn->predict($data);
+        
+        return ['data_training' => $sample, 'result' => $knn->predict($data)];
 
         } catch (\Throwable $th) {
             throw new ServerErrorHttpException('Terjadi masalah: '.$th->getLine().' - '. $th->getMessage());
@@ -280,5 +288,49 @@ class PrediksiPenjualanController extends Controller
             throw new ServerErrorHttpException('Terjadi masalah: '. $th->getMessage());
         }
         
+    }
+
+    public function actionPindahKeTraining($id_prediksi)
+    {
+        try {
+            $transaction = Yii::$app->db->beginTransaction();
+            $modelPrediksi = $this->findModel($id_prediksi);
+            $dataJumlahPenjualan = JenisDonatHasPrediksiPenjualan::findAll(['prediksi_penjualan_id' => $modelPrediksi->id]);
+
+            $modelPenjualan = new Penjualan();
+            $modelPenjualan->tahun_bulan_id = $modelPrediksi->tahun_bulan_id;
+            $modelPenjualan->label = $modelPrediksi->hasil_prediksi;
+
+            if($modelPenjualan->save()){
+                $hasSaved = true;
+                foreach ($dataJumlahPenjualan as $_ => $jp) {
+                    $modelJumlahPenjualan = new JenisDonatHasPenjualan();
+                    $modelJumlahPenjualan->penjualan_id = $modelPenjualan->id;
+                    $modelJumlahPenjualan->jumlah_penjualan = $jp->jumlah_penjualan;
+                    $modelJumlahPenjualan->jenis_donat_id = $jp->jenis_donat_id;
+
+                    if(!$modelJumlahPenjualan->save()){
+                        break;
+                    }                    
+                }
+
+                if($hasSaved){
+                    Yii::$app->session->setFlash('success', 'Data berhasil dipindahkan');
+                    $transaction->rollBack();
+                }else{
+                    Yii::$app->session->setFlash('error', 'Data gagal dipindahkan');
+                    $transaction->rollBack();
+                }
+                
+            }else{
+                Yii::$app->session->setFlash('error', 'Data gagal dipindahkan');
+                $transaction->rollBack();
+            }
+            
+            return $this->redirect(['index']);
+        } catch (\Throwable $th) {
+            throw new ServerErrorHttpException('Terjadi masalah: '. $th->getMessage());
+        }
+
     }
 }
