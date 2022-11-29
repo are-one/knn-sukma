@@ -77,7 +77,7 @@ class PenjualanController extends Controller
      */
     public function actionCreate()
     {
-        try {
+        // try {
             $transaction = Yii::$app->db->beginTransaction();
             
             $model = new Penjualan();
@@ -92,8 +92,10 @@ class PenjualanController extends Controller
                     $jenis_donat_id = $postJenisDonatHasPenjualan['jenis_donat_id'];
                     
                     $modelLama = Penjualan::findOne(['tahun_bulan_id' => $model->tahun_bulan_id]);
-                    $modelLama->label = $model->label;
-                    $model = ( $modelLama != null)? $modelLama : $model;
+                    if($modelLama != null){
+                        $modelLama->label = $model->label;
+                        $model = $modelLama;
+                    }
 
                     if($model->save()){
 
@@ -149,10 +151,10 @@ class PenjualanController extends Controller
                 'modelJenisDonatHasPenjualan' => $modelJenisDonatHasPenjualan,
             ]);  
 
-        } catch (\Throwable $th) {
-            $transaction->rollBack();
-            throw new ServerErrorHttpException('Terjadi masalah : '.$th->getLine(). ' - '. $th->getMessage());
-        }
+        // } catch (\Throwable $th) {
+        //     $transaction->rollBack();
+        //     throw new ServerErrorHttpException('Terjadi masalah : '.$th->getLine(). ' - '. $th->getMessage());
+        // }
         
     }
 
