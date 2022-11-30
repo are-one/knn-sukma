@@ -1,6 +1,6 @@
 <?php
 
-use app\models\JenisDonatHasPenjualan;
+use app\models\JenisBarangHasPenjualan;
 use app\models\Penjualan;
 use yii\grid\ActionColumn;
 use yii\helpers\Html;
@@ -30,7 +30,7 @@ $icons = (new ActionColumn())->icons;
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Jenis Donat</th>
+                        <th>Jenis Barang</th>
                         <th width="30%">Tahun - Bulan</th>
                         <th width="36%">Jumlah Penjualan</th>
                     </tr>
@@ -39,20 +39,20 @@ $icons = (new ActionColumn())->icons;
                     <?php 
                     $i = 1;
 
-                    foreach ($jenisDonat as $_ => $donat) {
-                        $penjualan = Penjualan::find()->joinWith(['jenisDonatHasPenjualans'])->select('tahun_bulan_id, penjualan.id, penjualan.label')->distinct()->where(['jenis_donat_has_penjualan.jenis_donat_id' => $donat->id])->orderBy(['tahun_bulan_id' => SORT_ASC])->all();
+                    foreach ($jenisBarang as $_ => $barang) {
+                        $penjualan = Penjualan::find()->joinWith(['jenisBarangHasPenjualans'])->select('tahun_bulan_id, penjualan.id, penjualan.label')->distinct()->where(['jenis_barang_has_penjualan.jenis_barang_id' => $barang->id])->orderBy(['tahun_bulan_id' => SORT_ASC])->all();
                         $jumlahPenjualan = null;
                         if($penjualan != null){
                             
                     ?>
                     <tr>
                         <td><?= $i ?></td>
-                        <td><?= $donat->jenis_donat ?></td>
+                        <td><?= $barang->jenis_barang ?></td>
                         <td colspan="2" class="p-0">
                             <table class="table table-bordered mb-0" width="100%">
                                 <?php
                                 foreach ($penjualan as $_ => $p) {
-                                    $jumlahPenjualan = JenisDonatHasPenjualan::find()->joinWith(['penjualan'])->where(['jenis_donat_id' => $donat->id, 'penjualan_id' => $p->id])->orderBy(['penjualan.tahun_bulan_id' => SORT_ASC])->all();
+                                    $jumlahPenjualan = JenisBarangHasPenjualan::find()->joinWith(['penjualan'])->where(['jenis_barang_id' => $barang->id, 'penjualan_id' => $p->id])->orderBy(['penjualan.tahun_bulan_id' => SORT_ASC])->all();
                                 ?>
                                     <tr>
                                         <td width="45%">
@@ -106,6 +106,19 @@ $icons = (new ActionColumn())->icons;
                                     </tr>
                             <?php
                                 }
+                    }
+
+                    if($jenisBarang == null){
+
+                    ?>
+
+                        <tr>
+                            <td class="text-center" colspan="4">
+                                <i class="text-muted">Data tidak ditemukan</i>
+                            </td>
+                        </tr>
+                    <?php
+                                
                     }
                     ?>
                 </tbody>

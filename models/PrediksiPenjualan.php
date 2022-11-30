@@ -11,7 +11,7 @@ use Yii;
  * @property string $hasil_prediksi
  * @property int $tahun_bulan_id
  *
- * @property JenisDonatHasPrediksiPenjualan[] $jenisDonatHasPrediksiPenjualans
+ * @property JenisBarangHasPrediksiPenjualan[] $jenisBarangHasPrediksiPenjualans
  * @property TahunBulan $tahunBulan
  */
 class PrediksiPenjualan extends \yii\db\ActiveRecord
@@ -50,13 +50,13 @@ class PrediksiPenjualan extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[JenisDonatHasPrediksiPenjualans]].
+     * Gets query for [[JenisBarangHasPrediksiPenjualans]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getJenisDonatHasPrediksiPenjualans()
+    public function getJenisBarangHasPrediksiPenjualans()
     {
-        return $this->hasMany(JenisDonatHasPrediksiPenjualan::class, ['prediksi_penjualan_id' => 'id']);
+        return $this->hasMany(JenisBarangHasPrediksiPenjualan::class, ['prediksi_penjualan_id' => 'id']);
     }
 
     /**

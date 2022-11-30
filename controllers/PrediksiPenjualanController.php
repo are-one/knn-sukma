@@ -2,9 +2,9 @@
 
 namespace app\controllers;
 
-use app\models\JenisDonat;
-use app\models\JenisDonatHasPenjualan;
-use app\models\JenisDonatHasPrediksiPenjualan;
+use app\models\JenisBarang;
+use app\models\JenisBarangHasPenjualan;
+use app\models\JenisBarangHasPrediksiPenjualan;
 use app\models\Penjualan;
 use app\models\PrediksiPenjualan;
 use app\models\search\PrediksiPenjualanSearch;
@@ -49,10 +49,10 @@ class PrediksiPenjualanController extends Controller
         $searchModel = new PrediksiPenjualanSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
-        $jenisDonat = JenisDonat::find()->all();
+        $jenisBarang = JenisBarang::find()->all();
 
         return $this->render('index', [
-            'jenisDonat' => $jenisDonat,
+            'jenisBarang' => $jenisBarang,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -81,7 +81,7 @@ class PrediksiPenjualanController extends Controller
         try {
             $transaction = Yii::$app->db->beginTransaction();
     
-            $modelDataPrediksi = new JenisDonatHasPrediksiPenjualan();
+            $modelDataPrediksi = new JenisBarangHasPrediksiPenjualan();
             $model = new PrediksiPenjualan();
     
             if ($this->request->isPost) {
@@ -91,14 +91,14 @@ class PrediksiPenjualanController extends Controller
                     $dataPrediksi =  $this->request->post($modelDataPrediksi->formName());
     
                     $data_jumlah_penjualan = $dataPrediksi['jumlah_penjualan'];
-                    $jenis_donat_id = $dataPrediksi['jenis_donat_id'];
+                    $jenis_barang_id = $dataPrediksi['jenis_barang_id'];
 
                     if(array_sum($data_jumlah_penjualan) < 1){
                         Yii::$app->session->setFlash('error', 'Tidak ada data yang ditambahkan');
                         return $this->redirect(['index']);
                     }
 
-                    $prediksi = $this->prediksi($data_jumlah_penjualan, $jenis_donat_id,3);
+                    $prediksi = $this->prediksi($data_jumlah_penjualan, $jenis_barang_id,3);
                     if(count($prediksi['data_training']) < 1){
                         Yii::$app->session->setFlash('error','Data training tidak ditemukan');
                         return $this->redirect(['index']);
@@ -115,13 +115,13 @@ class PrediksiPenjualanController extends Controller
                             if($jumlah_penjualan == 0) continue;
     
                             $banyak_data++;
-                            $jenisDonatHasPrediksiPenjualan = new JenisDonatHasPrediksiPenjualan();
-                            $jenisDonatHasPrediksiPenjualan->prediksi_penjualan_id = $model->id;
-                            $jenisDonatHasPrediksiPenjualan->jenis_donat_id = $jenis_donat_id;
-                            $jenisDonatHasPrediksiPenjualan->jumlah_penjualan = $jumlah_penjualan;
+                            $jenisBarangHasPrediksiPenjualan = new JenisBarangHasPrediksiPenjualan();
+                            $jenisBarangHasPrediksiPenjualan->prediksi_penjualan_id = $model->id;
+                            $jenisBarangHasPrediksiPenjualan->jenis_barang_id = $jenis_barang_id;
+                            $jenisBarangHasPrediksiPenjualan->jumlah_penjualan = $jumlah_penjualan;
     
-                            if(!$jenisDonatHasPrediksiPenjualan->save()){
-                                print_r($jenisDonatHasPrediksiPenjualan->getErrors());die;
+                            if(!$jenisBarangHasPrediksiPenjualan->save()){
+                                print_r($jenisBarangHasPrediksiPenjualan->getErrors());die;
                                 $hasSaved = false;
                                 break;
                             }
@@ -198,7 +198,7 @@ class PrediksiPenjualanController extends Controller
     public function actionDelete($id)
     {
         try {
-            if(JenisDonatHasPrediksiPenjualan::deleteAll(['prediksi_penjualan_id' => $id])){
+            if(JenisBarangHasPrediksiPenjualan::deleteAll(['prediksi_penjualan_id' => $id])){
                 $this->findModel($id)->delete();
                 Yii::$app->session->setFlash('success', 'Data prediksi penjualan berhasil dihapus');
             }else{
@@ -228,23 +228,23 @@ class PrediksiPenjualanController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-    public function prediksi($data, $id_jenis_donat, $k)
+    public function prediksi($data, $id_jenis_barang, $k)
     {
         try {
             $knn = new KNearestNeighbors($k, new Euclidean());
             
             $sample = [];
             
-            //mencari data training berdasarkan jenis donat
-            // $penjualan_donat = Penjualan::find()->joinWith(['jenisDonatHasPenjualans jp'])->where(['jp.jenis_donat_id' => $id_jenis_donat])->all();
-            //mangambil data training tanpa menperhatikan jenis donat
-            $penjualan_donat = Penjualan::find()->joinWith(['jenisDonatHasPenjualans jp'])->where(['jp.jenis_donat_id' => $id_jenis_donat])->all();
+            //mencari data training berdasarkan jenis barang
+            // $penjualan_barang = Penjualan::find()->joinWith(['jenisBarangHasPenjualans jp'])->where(['jp.jenis_barang_id' => $id_jenis_barang])->all();
+            //mangambil data training tanpa menperhatikan jenis barang
+            $penjualan_barang = Penjualan::find()->joinWith(['jenisBarangHasPenjualans jp'])->where(['jp.jenis_barang_id' => $id_jenis_barang])->all();
 
             $sample = [];
             $lables = [];
 
-            foreach ($penjualan_donat as $no_sample => $dp) {
-                $data_jumlah_penjualan = $dp->jenisDonatHasPenjualans;
+            foreach ($penjualan_barang as $no_sample => $dp) {
+                $data_jumlah_penjualan = $dp->jenisBarangHasPenjualans;
                 for ($i=0; $i < 10; $i++) { 
                     $sample[$no_sample][] = isset($data_jumlah_penjualan[$i])? $data_jumlah_penjualan[$i]->jumlah_penjualan : 0;
                 }
@@ -264,13 +264,13 @@ class PrediksiPenjualanController extends Controller
     public function actionDeleteJumlahPenjualan($id)
     {
         try {
-            $jenisDonatHasPrediksiPenjualan = JenisDonatHasPrediksiPenjualan::findOne(['id' => $id]);
-            $prediksi_penjualan_id = $jenisDonatHasPrediksiPenjualan->prediksi_penjualan_id;
+            $jenisBarangHasPrediksiPenjualan = JenisBarangHasPrediksiPenjualan::findOne(['id' => $id]);
+            $prediksi_penjualan_id = $jenisBarangHasPrediksiPenjualan->prediksi_penjualan_id;
 
             // Hitung jumlah data
-            $jumlah_data = JenisDonatHasPrediksiPenjualan::find()->where(['prediksi_penjualan_id' => $prediksi_penjualan_id])->count();
+            $jumlah_data = JenisBarangHasPrediksiPenjualan::find()->where(['prediksi_penjualan_id' => $prediksi_penjualan_id])->count();
             
-            if($jenisDonatHasPrediksiPenjualan->delete()){
+            if($jenisBarangHasPrediksiPenjualan->delete()){
                 Yii::$app->session->setFlash('success', 'Data penjualan berhasil dihapus');
             }else{
                 Yii::$app->session->setFlash('error', 'Data penjualan gagal dihapus');
@@ -295,7 +295,7 @@ class PrediksiPenjualanController extends Controller
         try {
             $transaction = Yii::$app->db->beginTransaction();
             $modelPrediksi = $this->findModel($id_prediksi);
-            $dataJumlahPenjualan = JenisDonatHasPrediksiPenjualan::findAll(['prediksi_penjualan_id' => $modelPrediksi->id]);
+            $dataJumlahPenjualan = JenisBarangHasPrediksiPenjualan::findAll(['prediksi_penjualan_id' => $modelPrediksi->id]);
 
             $modelPenjualan = new Penjualan();
             $modelPenjualan->tahun_bulan_id = $modelPrediksi->tahun_bulan_id;
@@ -304,10 +304,10 @@ class PrediksiPenjualanController extends Controller
             if($modelPenjualan->save()){
                 $hasSaved = true;
                 foreach ($dataJumlahPenjualan as $_ => $jp) {
-                    $modelJumlahPenjualan = new JenisDonatHasPenjualan();
+                    $modelJumlahPenjualan = new JenisBarangHasPenjualan();
                     $modelJumlahPenjualan->penjualan_id = $modelPenjualan->id;
                     $modelJumlahPenjualan->jumlah_penjualan = $jp->jumlah_penjualan;
-                    $modelJumlahPenjualan->jenis_donat_id = $jp->jenis_donat_id;
+                    $modelJumlahPenjualan->jenis_barang_id = $jp->jenis_barang_id;
 
                     if(!$modelJumlahPenjualan->save()){
                         break;

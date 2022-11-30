@@ -40,7 +40,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         'options' => ['class' => 'navbar-nav'],
         'items' => [
             ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'Jenis Donat', 'url' => ['/jenis-donat/index']],
+            ['label' => 'Jenis Barang', 'url' => ['/jenis-barang/index']],
             ['label' => 'Tahun-Bulan', 'url' => ['/tahun-bulan/index']],
             ['label' => 'Data Training', 'url' => ['/penjualan/index']],
             ['label' => 'Klasifikasi/Prediksi', 'url' => ['/prediksi-penjualan/index']],

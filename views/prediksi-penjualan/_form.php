@@ -1,6 +1,6 @@
 <?php
 
-use app\models\JenisDonat;
+use app\models\JenisBarang;
 use app\models\TahunBulan;
 use kartik\select2\Select2;
 use yii\helpers\ArrayHelper;
@@ -16,16 +16,16 @@ use yii\bootstrap5\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($modelDataPrediksi, 'jenis_donat_id')->widget(Select2::class,[
-        'data' => ArrayHelper::map(JenisDonat::find()->all(), 'id',function($model)
+    <?= $form->field($modelDataPrediksi, 'jenis_barang_id')->widget(Select2::class,[
+        'data' => ArrayHelper::map(JenisBarang::find()->all(), 'id',function($model)
         {
-            return $model->jenis_donat;
+            return $model->jenis_barang;
         }),
-        'options' => ['placeholder' => 'Pilih jenis donat ...'],
+        'options' => ['placeholder' => 'Pilih jenis barang ...'],
         'pluginOptions' => [
             'allowClear' => true,
         ],
-    ])->label('Jenis Donat') ?>
+    ])->label('Jenis Barang') ?>
 
     <?= $form->field($model, 'tahun_bulan_id')->widget(Select2::class,[
         'data' => ArrayHelper::map(TahunBulan::find()->all(), 'id',function($model)
@@ -42,7 +42,7 @@ use yii\bootstrap5\ActiveForm;
         <?php for($i = 0; $i < 10; $i++){ ?>
             <?= $form->field($modelDataPrediksi, "jumlah_penjualan[{$i}]", [
                 'options' => ['class' => 'col-3 mb-3']
-            ])->textInput(['value' => 0]) ?>
+            ])->textInput(['value' => 0,'type' => 'number', 'min' => 0]) ?>
         <?php } ?>
     </div>
 

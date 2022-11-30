@@ -2,9 +2,9 @@
 
 namespace app\controllers;
 
-use app\models\JenisDonat;
-use app\models\JenisDonatHasPenjualan;
-use app\models\JenisDonatHasPrediksiPenjualan;
+use app\models\JenisBarang;
+use app\models\JenisBarangHasPenjualan;
+use app\models\JenisBarangHasPrediksiPenjualan;
 use app\models\Penjualan;
 use app\models\search\PenjualanSearch;
 use Yii;
@@ -47,11 +47,11 @@ class PenjualanController extends Controller
         $searchModel = new PenjualanSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
-        $jenisDonat = JenisDonat::find()->all();
+        $jenisBarang = JenisBarang::find()->all();
 
 
         return $this->render('index', [
-            'jenisDonat' => $jenisDonat,
+            'jenisBarang' => $jenisBarang,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -81,15 +81,15 @@ class PenjualanController extends Controller
             $transaction = Yii::$app->db->beginTransaction();
             
             $model = new Penjualan();
-            $modelJenisDonatHasPenjualan = new JenisDonatHasPenjualan();
+            $modelJenisBarangHasPenjualan = new JenisBarangHasPenjualan();
 
 
             if ($this->request->isPost) {
                 
-                if ($model->load($this->request->post()) && $modelJenisDonatHasPenjualan->load($this->request->post())) {
-                    $postJenisDonatHasPenjualan =  $this->request->post($modelJenisDonatHasPenjualan->formName());
-                    $dataJumlahPenjualan = $postJenisDonatHasPenjualan['jumlah_penjualan'];
-                    $jenis_donat_id = $postJenisDonatHasPenjualan['jenis_donat_id'];
+                if ($model->load($this->request->post()) && $modelJenisBarangHasPenjualan->load($this->request->post())) {
+                    $postJenisBarangHasPenjualan =  $this->request->post($modelJenisBarangHasPenjualan->formName());
+                    $dataJumlahPenjualan = $postJenisBarangHasPenjualan['jumlah_penjualan'];
+                    $jenis_barang_id = $postJenisBarangHasPenjualan['jenis_barang_id'];
                     
                     $modelLama = Penjualan::findOne(['tahun_bulan_id' => $model->tahun_bulan_id]);
                     if($modelLama != null){
@@ -106,13 +106,13 @@ class PenjualanController extends Controller
                             if($jumlah_penjualan == 0) continue;
 
                             $banyak_data++;
-                            $jenisDonatHasPenjualan = new JenisDonatHasPenjualan();
-                            $jenisDonatHasPenjualan->penjualan_id = $model->id;
-                            $jenisDonatHasPenjualan->jenis_donat_id = $jenis_donat_id;
-                            $jenisDonatHasPenjualan->jumlah_penjualan = $jumlah_penjualan;
+                            $jenisBarangHasPenjualan = new JenisBarangHasPenjualan();
+                            $jenisBarangHasPenjualan->penjualan_id = $model->id;
+                            $jenisBarangHasPenjualan->jenis_barang_id = $jenis_barang_id;
+                            $jenisBarangHasPenjualan->jumlah_penjualan = $jumlah_penjualan;
 
-                            if(!$jenisDonatHasPenjualan->save()){
-                                print_r($jenisDonatHasPenjualan->getErrors());die;
+                            if(!$jenisBarangHasPenjualan->save()){
+                                print_r($jenisBarangHasPenjualan->getErrors());die;
                                 $hasSaved = false;
                                 break;
                             }
@@ -143,12 +143,12 @@ class PenjualanController extends Controller
                 }
             } else {
                 $model->loadDefaultValues();
-                $modelJenisDonatHasPenjualan->loadDefaultValues();
+                $modelJenisBarangHasPenjualan->loadDefaultValues();
             }
 
             return $this->render('create', [
                 'model' => $model,
-                'modelJenisDonatHasPenjualan' => $modelJenisDonatHasPenjualan,
+                'modelJenisBarangHasPenjualan' => $modelJenisBarangHasPenjualan,
             ]);  
 
         // } catch (\Throwable $th) {
@@ -188,7 +188,7 @@ class PenjualanController extends Controller
     public function actionDelete($id)
     {
         try {
-            if(JenisDonatHasPenjualan::deleteAll(['penjualan_id' => $id])){
+            if(JenisBarangHasPenjualan::deleteAll(['penjualan_id' => $id])){
                 $this->findModel($id)->delete();
                 Yii::$app->session->setFlash('success', 'Data penjualan berhasil dihapus');
             }else{
@@ -220,13 +220,13 @@ class PenjualanController extends Controller
     public function actionDeleteJumlahPenjualan($id)
     {
         try {
-            $modelJenisDonatHasPenjualan = JenisDonatHasPenjualan::findOne(['id' => $id]);
-            $penjualan_id = $modelJenisDonatHasPenjualan->penjualan_id;
+            $modelJenisBarangHasPenjualan = JenisBarangHasPenjualan::findOne(['id' => $id]);
+            $penjualan_id = $modelJenisBarangHasPenjualan->penjualan_id;
 
             // Hitung jumlah data
-            $jumlah_data = JenisDonatHasPenjualan::find()->where(['penjualan_id' => $penjualan_id])->count();
+            $jumlah_data = JenisBarangHasPenjualan::find()->where(['penjualan_id' => $penjualan_id])->count();
             
-            if($modelJenisDonatHasPenjualan->delete()){
+            if($modelJenisBarangHasPenjualan->delete()){
                 Yii::$app->session->setFlash('success', 'Data penjualan berhasil dihapus');
             }else{
                 Yii::$app->session->setFlash('error', 'Data penjualan gagal dihapus');

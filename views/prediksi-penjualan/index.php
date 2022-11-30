@@ -1,6 +1,6 @@
 <?php
 
-use app\models\JenisDonatHasPrediksiPenjualan;
+use app\models\JenisBarangHasPrediksiPenjualan;
 use app\models\PrediksiPenjualan;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -33,29 +33,30 @@ $icons = (new ActionColumn())->icons;
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Jenis Donat</th>
+                        <th>Jenis Barang</th>
                         <th width="30%">Tahun - Bulan</th>
                         <th width="36%">Jumlah Penjualan</th>
+                        <th>Hasil Prediksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php 
                     $i = 1;
 
-                    foreach ($jenisDonat as $_ => $donat) {
-                        $penjualan = PrediksiPenjualan::find()->joinWith(['jenisDonatHasPrediksiPenjualans'])->select('tahun_bulan_id, prediksi_penjualan.id, prediksi_penjualan.hasil_prediksi')->distinct()->where(['jenis_donat_has_prediksi_penjualan.jenis_donat_id' => $donat->id])->orderBy(['tahun_bulan_id' => SORT_ASC])->all();
+                    foreach ($jenisBarang as $_ => $barang) {
+                        $penjualan = PrediksiPenjualan::find()->joinWith(['jenisBarangHasPrediksiPenjualans'])->select('tahun_bulan_id, prediksi_penjualan.id, prediksi_penjualan.hasil_prediksi')->distinct()->where(['jenis_barang_has_prediksi_penjualan.jenis_barang_id' => $barang->id])->orderBy(['tahun_bulan_id' => SORT_ASC])->all();
                         $jumlahPenjualan = null;
                         if($penjualan != null){
                             
                     ?>
                     <tr>
                         <td><?= $i ?></td>
-                        <td><?= $donat->jenis_donat ?></td>
+                        <td><?= $barang->jenis_barang ?></td>
                         <td colspan="2" class="p-0">
                             <table class="table table-bordered mb-0" width="100%">
                                 <?php
                                 foreach ($penjualan as $_ => $p) {
-                                    $jumlahPenjualan = JenisDonatHasPrediksiPenjualan::find()->joinWith(['prediksiPenjualan'])->where(['jenis_donat_id' => $donat->id, 'prediksi_penjualan_id' => $p->id])->orderBy(['prediksi_penjualan.tahun_bulan_id' => SORT_ASC])->all();
+                                    $jumlahPenjualan = JenisBarangHasPrediksiPenjualan::find()->joinWith(['prediksiPenjualan'])->where(['jenis_barang_id' => $barang->id, 'prediksi_penjualan_id' => $p->id])->orderBy(['prediksi_penjualan.tahun_bulan_id' => SORT_ASC])->all();
                                 ?>
                                     <tr>
                                         <td width="45%">
@@ -89,12 +90,10 @@ $icons = (new ActionColumn())->icons;
                                                 ?>
                                             </table>
                                         </td>
-                                        <td class="h-100">
-                                                <span class="d-flex align-items-end mb-3">
+                                        <td class="text-center">
                                                     <?= $p->hasil_prediksi ?>
-                                                </span>
-                                            </td>
-                                        </tr>
+                                        </td>
+                                    </tr>
                                        
                                         <?php 
                                     } 
@@ -113,6 +112,19 @@ $icons = (new ActionColumn())->icons;
                                     </tr>
                             <?php
                                 }
+                    }
+
+                    if($jenisBarang == null){
+
+                        ?>
+    
+                            <tr>
+                                <td class="text-center" colspan="5">
+                                    <i class="text-muted">Data tidak ditemukan</i>
+                                </td>
+                            </tr>
+                    <?php
+                                
                     }
                     ?>
                 </tbody>

@@ -11,7 +11,7 @@ use Yii;
  * @property int $tahun_bulan_id
  * @property string $label
  *
- * @property JenisDonatHasPenjualan[] $jenisDonatHasPenjualans
+ * @property JenisBarangHasPenjualan[] $jenisBarangHasPenjualans
  * @property TahunBulan $tahunBulan
  */
 class Penjualan extends \yii\db\ActiveRecord
@@ -50,13 +50,13 @@ class Penjualan extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[JenisDonatHasPenjualans]].
+     * Gets query for [[JenisBarangHasPenjualans]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getJenisDonatHasPenjualans()
+    public function getJenisBarangHasPenjualans()
     {
-        return $this->hasMany(JenisDonatHasPenjualan::class, ['penjualan_id' => 'id']);
+        return $this->hasMany(JenisBarangHasPenjualan::class, ['penjualan_id' => 'id']);
     }
 
     /**
