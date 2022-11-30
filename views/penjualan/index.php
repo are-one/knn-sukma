@@ -25,14 +25,15 @@ $icons = (new ActionColumn())->icons;
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-   <div class="table-responsive">
+    <div class="table-responsive">
         <table class="table table-bordered">
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Jenis Barang</th>
-                        <th width="30%">Tahun - Bulan</th>
-                        <th width="36%">Jumlah Penjualan</th>
+                        <th width="25%">Jenis Barang</th>
+                        <th width="25%">Tahun - Bulan</th>
+                        <th width="17%">Jumlah Penjualan</th>
+                        <th class="text-center">Label</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -43,59 +44,58 @@ $icons = (new ActionColumn())->icons;
                         $penjualan = Penjualan::find()->joinWith(['jenisBarangHasPenjualans'])->select('tahun_bulan_id, penjualan.id, penjualan.label')->distinct()->where(['jenis_barang_has_penjualan.jenis_barang_id' => $barang->id])->orderBy(['tahun_bulan_id' => SORT_ASC])->all();
                         $jumlahPenjualan = null;
                         if($penjualan != null){
-                            
                     ?>
+
                     <tr>
-                        <td><?= $i ?></td>
-                        <td><?= $barang->jenis_barang ?></td>
-                        <td colspan="2" class="p-0">
-                            <table class="table table-bordered mb-0" width="100%">
-                                <?php
-                                foreach ($penjualan as $_ => $p) {
-                                    $jumlahPenjualan = JenisBarangHasPenjualan::find()->joinWith(['penjualan'])->where(['jenis_barang_id' => $barang->id, 'penjualan_id' => $p->id])->orderBy(['penjualan.tahun_bulan_id' => SORT_ASC])->all();
-                                ?>
-                                    <tr>
-                                        <td width="45%">
-                                            <?= $p->tahunBulan->bulan . ' - '. $p->tahunBulan->tahun ?>
-                                            <?= Html::a($icons['trash'], ['penjualan/delete','id' => $p->id], [
-                                                                        'class' => 'float-end',
-                                                                        'data' => [
-                                                                                    'method' => 'post',
-                                                                                    'confirm' => 'Menghapus data Tahun-Bulan akan menghapus seluruh data jumlah penjualan yang berkaitan data ini. Apakah anda yakin ingin?',
-                                                                                ]
-                                                                            ]) ?>
-                                        </td>
-                                        <td class="p-0">
-                                            <table class="table table-bordered mb-0">
-                                                <?php
-                                                foreach ($jumlahPenjualan as $_ => $jp) {    
-                                                ?>
-                                                    <tr>
-                                                        <td><?= $jp->jumlah_penjualan ?></td>
-                                                        <td width="4%">
-                                                            <?= Html::a($icons['trash'], ['delete-jumlah-penjualan','id' => $jp->id], ['data' => [
-                                                                                    'method' => 'post',
-                                                                                    'confirm' => 'Are you sure you want to delete this item?',
-                                                                                ]
-                                                                            ]) ?>
-                                                        </td>
-                                                    </tr>
-                                                <?php 
-                                                    } 
-                                                ?>
-                                            </table>
-                                        </td>
-                                        <td class="text-center">
-                                            <?= $p->label ?>
-                                        </td>
-                                    </tr>
-                                    <?php 
-                                    } 
-                                    ?>
-                            </table>
-                        </td>
+                        <td rowspan="<?= count($penjualan) + 1 ?>"><?= $i ?></td>
+                        <td rowspan="<?= count($penjualan) + 1 ?>"><?= $barang->jenis_barang ?></td>
+                       
                     </tr>
-                    <?php 
+
+                    <?php
+                        foreach ($penjualan as $_ => $p) {
+                            $jumlahPenjualan = JenisBarangHasPenjualan::find()->joinWith(['penjualan'])->where(['jenis_barang_id' => $barang->id, 'penjualan_id' => $p->id])->orderBy(['penjualan.tahun_bulan_id' => SORT_ASC])->all();
+                        ?>
+                        <tr>
+                            <td>
+                                <?= $p->tahunBulan->bulan . ' - '. $p->tahunBulan->tahun ?>
+                                <?= Html::a($icons['trash'], ['prediksi-penjualan/delete','id' => $p->id], [
+                                                            'class' => 'float-end',
+                                                            'data' => [
+                                                                        'method' => 'post',
+                                                                        'confirm' => 'Menghapus data Tahun-Bulan akan menghapus seluruh data jumlah penjualan yang berkaitan data ini. Apakah anda yakin ingin?',
+                                                                    ]
+                                                                ]) ?>
+                            </td>
+
+                            <td class="p-0">
+                                <table class="table table-bordered mb-0">
+                                    <?php
+                                    foreach ($jumlahPenjualan as $_ => $jp) {    
+                                    ?>
+                                        <tr>
+                                            <td><?= $jp->jumlah_penjualan ?></td>
+                                            <td width="4%">
+                                                <?= Html::a($icons['trash'], ['prediksi-penjualan/delete-jumlah-penjualan','id' => $jp->id], ['data' => [
+                                                                        'method' => 'post',
+                                                                        'confirm' => 'Are you sure you want to delete this item?',
+                                                                    ]
+                                                                ]) ?>
+                                            </td>
+                                        </tr>
+                                    <?php 
+                                        } 
+                                    ?>
+                                </table>
+                            </td>
+                            <td class="text-center">
+                                        <?= $p->label ?>
+                            </td>
+                        </tr>
+                                
+                        <?php 
+                            } 
+                           
                             $i++;
                         }else{
                             ?>
@@ -110,13 +110,13 @@ $icons = (new ActionColumn())->icons;
 
                     if($jenisBarang == null){
 
-                    ?>
-
-                        <tr>
-                            <td class="text-center" colspan="4">
-                                <i class="text-muted">Data tidak ditemukan</i>
-                            </td>
-                        </tr>
+                        ?>
+    
+                            <tr>
+                                <td class="text-center" colspan="5">
+                                    <i class="text-muted">Data tidak ditemukan</i>
+                                </td>
+                            </tr>
                     <?php
                                 
                     }
