@@ -51,8 +51,8 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 
             <div class="copy_layout">
                 <div class="row text-muted">
-                    <div class="col-md-6 text-center text-md-start">&copy; KNN <?= date('Y') ?></div>
-                    <div class="col-md-6 text-center text-md-end"><?= Yii::powered() ?></div>
+                    <div class="text-center text-md-start">&copy; KNN <?= date('Y') ?></div>
+                    <!-- <div class="col-md-6 text-center text-md-end"><?= Yii::powered() ?></div> -->
                 </div>
             </div>
         </div>
