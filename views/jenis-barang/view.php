@@ -7,13 +7,11 @@ use yii\widgets\DetailView;
 /** @var app\models\JenisBarang $model */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Jenis Barangs', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Jenis Barang', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="jenis-barang-view">
-
-    <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
         <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
@@ -25,6 +23,8 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
     </p>
+
+    <hr style="margin-top: 10px;margin-bottom: 10px;">
 
     <?= DetailView::widget([
         'model' => $model,
