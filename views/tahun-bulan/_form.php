@@ -2,7 +2,7 @@
 
 use kartik\select2\Select2;
 use yii\helpers\Html;
-use yii\bootstrap5\ActiveForm;
+use yii\bootstrap\ActiveForm;
 
 /** @var yii\web\View $this */
 /** @var app\models\TahunBulan $model */
@@ -24,24 +24,28 @@ $list_bulan = [
 ];
 ?>
 
-<div class="tahun-bulan-form">
+<div class="bs-example1" data-example-id="contextual-table">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <div class="tahun-bulan-form">
 
-    <?= $form->field($model, 'bulan')->widget(Select2::class,[
-        'data' => $list_bulan,
-        'options' => ['placeholder' => 'Pilih bulan ...'],
-        'pluginOptions' => [
-            'allowClear' => true,
-        ],
-    ])->label('Bulan') ?>
-    
-    <?= $form->field($model, 'tahun')->textInput() ?>
+        <?php $form = ActiveForm::begin(); ?>
 
-    <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= $form->field($model, 'bulan')->widget(Select2::class,[
+            'data' => $list_bulan,
+            'options' => ['placeholder' => 'Pilih bulan ...', 'class' => 'form-control1'],
+            'pluginOptions' => [
+                'allowClear' => true,
+            ],
+        ])->label('Bulan') ?>
+        
+        <?= $form->field($model, 'tahun')->textInput(['class' => 'form-control1']) ?>
+
+        <div class="form-group">
+            <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        </div>
+
+        <?php ActiveForm::end(); ?>
+
     </div>
-
-    <?php ActiveForm::end(); ?>
 
 </div>

@@ -17,9 +17,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <hr>
+    <div class="bs-example1" data-example-id="contextual-table">
+
     <p>
-        <?= Html::a('Tambah Tahun Bulan', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Tambah Tahun Bulan', ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom: 5px']) ?>
     </p>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -31,8 +32,18 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             // 'id',
-            'bulan',
-            'tahun',
+            [
+                'attribute' => 'bulan',
+                'filterInputOptions' => [
+                    'class' => 'form-control1'
+                ],
+            ],
+            [
+                'attribute' => 'tahun',
+                'filterInputOptions' => [
+                    'class' => 'form-control1'
+                ],
+            ],
             [
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, TahunBulan $model, $key, $index, $column) {
@@ -42,5 +53,6 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
 
+    </div>
 
 </div>

@@ -9,6 +9,7 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\User;
 use Phpml\Classification\KNearestNeighbors;
 use Phpml\Math\Distance\Euclidean;
 
@@ -22,10 +23,13 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['logout'],
                 'rules' => [
                     [
-                        'actions' => ['logout'],
+                        'actions' => ['login', 'error'],
+                        'allow' => true,
+                    ],
+                    [
+                        'actions' => ['logout', 'index', 'hasil-survey'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -63,27 +67,6 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        // $knn = new KNearestNeighbors(3, new Euclidean());
-        
-        // $sample = [
-        //     [1000,2908,4550,1278,100,50,124,50],
-        //     [300,2908,4550,1278,100,50,124,50],
-        //     [500,2908,5000,1278,100,50,124,50],
-        //     [611,2819,2732,1198,45,15,32,12],
-        //     [500,4311,3870,1450,55,30,45,20],
-        //     [300,2908,4550,1278,100,124,0,0],
-        //     [300,2908,4550,1278,100,45,100,37],
-        //     [300,2908,4550,1278,100,45,100,37],
-        //     [300,2908,4550,1278,100,45,100,37],
-        //     [300,2908,4550,1278,100,50,124,50],
-        //     [600,2908,4550,1278,100,50,124,50]
-        // ];
-
-        // $lable = [10060,9360,10010,7464,10281,9260,9318,9318,9318,9360,9660,918,3867,4949];
-        // $lables = ['Terbanyak','Sedikit','Terbanyak','Sedikit','Terbanyak','Sedikit','Sedikit','Sedikit','Sedikit','Sedikit','Sedikit'];
-        // $knn->train($sample, $lables);
-
-        // echo $knn->predict([3002,5210,5444,3892,2389,602,1008,430]);die;
         return $this->render('index');
     }
 
@@ -94,6 +77,8 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
+        $this->layout = 'login-layout';
+        
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
@@ -148,4 +133,17 @@ class SiteController extends Controller
     {
         return $this->render('about');
     }
+
+    // public function actionSetUser()
+    // {
+    //     $model = new User();
+
+    //     $model->username = 'sukma';
+    //     $model->setPassword('sukma123');
+    //     if($model->save()){
+    //         echo "berhasil";
+    //     }else{
+    //         print_r($model->getErrors());
+    //     }
+    // }
 }

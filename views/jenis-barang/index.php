@@ -17,29 +17,34 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <hr>
-    <p>
-        <?= Html::a('Tambah Jenis Barang', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+    <div class="bs-example1" data-example-id="contextual-table">
+        <p>
+            <?= Html::a('Tambah Jenis Barang', ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom: 5px']) ?>
+        </p>
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+        <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+        <?= GridView::widget([
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'columns' => [
+                ['class' => 'yii\grid\SerialColumn'],
 
-            // 'id',
-            'jenis_barang',
-            [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, JenisBarang $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
+                // 'id',
+                [
+                    'attribute' => 'jenis_barang',
+                    'filterInputOptions' => [
+                        'class' => 'form-control1'
+                    ],
+                ],
+                [
+                    'class' => ActionColumn::className(),
+                    'urlCreator' => function ($action, JenisBarang $model, $key, $index, $column) {
+                        return Url::toRoute([$action, 'id' => $model->id]);
+                    }
+                ],
             ],
-        ],
-    ]); ?>
-
+        ]); ?>
+    </div>
 
 </div>

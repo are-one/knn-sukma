@@ -1,23 +1,27 @@
 <?php
 
 use yii\helpers\Html;
-use yii\bootstrap5\ActiveForm;
+use yii\bootstrap\ActiveForm;
 
 /** @var yii\web\View $this */
 /** @var app\models\JenisDonat $model */
 /** @var yii\widgets\ActiveForm $form */
 ?>
 
-<div class="jenis-barang-form">
+<div class="bs-example1" data-example-id="contextual-table">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <div class="jenis-barang-form">
 
-    <?= $form->field($model, 'jenis_barang')->textInput(['maxlength' => true]) ?>
+        <?php $form = ActiveForm::begin(); ?>
 
-    <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= $form->field($model, 'jenis_barang')->textInput(['maxlength' => true, 'class' => 'form-control1']) ?>
+
+        <div class="form-group">
+            <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        </div>
+
+        <?php ActiveForm::end(); ?>
+
     </div>
-
-    <?php ActiveForm::end(); ?>
 
 </div>
