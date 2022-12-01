@@ -25,59 +25,40 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <head>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
+    <script type="application/x-javascript">
+      addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); }
+    </script>
 </head>
-<body class="d-flex flex-column h-100">
+<body>
 <?php $this->beginBody() ?>
+<div id="wrapper">
 
-<header id="header">
-    <?php
-    NavBar::begin([
-        'brandLabel' => Yii::$app->name,
-        'brandUrl' => Yii::$app->homeUrl,
-        'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
-    ]);
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav'],
-        'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'Jenis Barang', 'url' => ['/jenis-barang/index']],
-            ['label' => 'Tahun-Bulan', 'url' => ['/tahun-bulan/index']],
-            ['label' => 'Data Training', 'url' => ['/penjualan/index']],
-            ['label' => 'Klasifikasi/Prediksi', 'url' => ['/prediksi-penjualan/index']],
-            // Yii::$app->user->isGuest
-            //     ? ['label' => 'Login', 'url' => ['/site/login']]
-            //     : '<li class="nav-item">'
-            //         . Html::beginForm(['/site/logout'])
-            //         . Html::submitButton(
-            //             'Logout (' . Yii::$app->user->identity->username . ')',
-            //             ['class' => 'nav-link btn btn-link logout']
-            //         )
-            //         . Html::endForm()
-            //         . '</li>'
-        ]
-    ]);
-    NavBar::end();
-    ?>
-</header>
+    <?= $this->render('nav'); ?>
 
-<main id="main" class="flex-shrink-0" role="main">
-    <div class="container">
-        <?php if (!empty($this->params['breadcrumbs'])): ?>
-            <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
-        <?php endif ?>
-        <?= Alert::widget() ?>
-        <?= $content ?>
-    </div>
-</main>
+    <div id="page-wrapper">
+        <div class="graphs">
 
-<footer id="footer" class="mt-auto py-3 bg-light">
-    <div class="container">
-        <div class="row text-muted">
-            <div class="col-md-6 text-center text-md-start">&copy; KNN <?= date('Y') ?></div>
-            <div class="col-md-6 text-center text-md-end"><?= Yii::powered() ?></div>
+            <div class="xs">
+                <?php if (!empty($this->params['breadcrumbs'])): ?>
+                    <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
+                <?php endif ?>
+                <?= Alert::widget() ?>
+                <?= $content ?>
+                <div class="clearfix"></div>
+
+            </div>
+       
+
+            <div class="copy_layout">
+                <div class="row text-muted">
+                    <div class="col-md-6 text-center text-md-start">&copy; KNN <?= date('Y') ?></div>
+                    <div class="col-md-6 text-center text-md-end"><?= Yii::powered() ?></div>
+                </div>
+            </div>
         </div>
     </div>
-</footer>
+
+</div>
 
 <?php $this->endBody() ?>
 </body>
