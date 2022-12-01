@@ -6,9 +6,10 @@
 use app\assets\LoginAppAsset;
 use app\widgets\Alert;
 use yii\bootstrap5\Breadcrumbs;
-use yii\bootstrap5\Html;
 use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
+use yii\helpers\Html;
+use yii\helpers\Url;
 
 LoginAppAsset::register($this);
 
@@ -30,7 +31,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <body id="login">
 <?php $this->beginBody() ?>
     <div class="login-logo">
-        <a href="index.html"><img src="images/logo.png" alt=""/></a>
+        <a href="index.html"><?= Html::img(Url::base()."/img/uho.png",['width' => 150]) ?><img src="/template/images/logo.png" alt=""/></a>
     </div>
 
     <h2 class="form-heading">login</h2>
