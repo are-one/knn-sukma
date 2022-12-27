@@ -42,7 +42,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                 <?php if (!empty($this->params['breadcrumbs'])): ?>
                     <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
                 <?php endif ?>
-                <?= Alert::widget() ?>
+                <?= Alert::widget(); ?>
                 <?= $content ?>
                 <div class="clearfix"></div>
 
@@ -61,6 +61,9 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 </div>
 
 <?php $this->endBody() ?>
+<script>
+jQuery("#select_jenis_barang").select2();
+</script>
 </body>
 </html>
 <?php $this->endPage() ?>

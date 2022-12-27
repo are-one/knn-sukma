@@ -1,17 +1,22 @@
 <?php
 
+use app\models\JenisBarang;
 use app\models\JenisBarangHasPrediksiPenjualan;
 use app\models\PrediksiPenjualan;
+use kartik\select2\Select2;
+use yii\bootstrap\ActiveForm;
+use yii\bootstrap\Modal;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
+use yii\helpers\ArrayHelper;
 
 /** @var yii\web\View $this */
 /** @var app\models\search\PrediksiPenjualanSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = 'Hasil Prediksi Penjualan';
+$this->title = 'Data Testing';
 $this->params['breadcrumbs'][] = $this->title;
 
 $icons = (new ActionColumn())->icons;
@@ -23,7 +28,11 @@ $icons = (new ActionColumn())->icons;
 
     <div class="bs-example1" data-example-id="contextual-table"> 
         <p>
-            <?= Html::a('Prediksi Data Penjualan', ['create'], ['class' => 'btn btn-success']) ?>
+            <?= Html::a('Download Template Upload Excel', ['template'], ['class' => 'btn btn-info']); ?>
+            <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#upload">Upload Data</button>
+            <?= Html::a('Tambah Data', ['create'], ['class' => 'btn btn-primary']) ?>
+            <?= Html::a('Hapus Semua', ['delete-all'], ['class' => 'btn btn-danger']) ?>
+
         </p>
         <hr>
 
@@ -33,11 +42,19 @@ $icons = (new ActionColumn())->icons;
             <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>No</th>
-                            <th width="25%">Jenis Barang</th>
-                            <th width="25%">Tahun - Bulan</th>
-                            <th width="17%">Jumlah Penjualan</th>
-                            <th class="text-center">Hasil Prediksi</th>
+                            <th rowspan="2">No</th>
+                            <th rowspan="2" width="25%">Jenis Barang</th>
+                            <th rowspan="2" width="25%">Tahun - Bulan</th>
+                            <th colspan="8" width="17%" class="text-center">Jumlah Penjualan</th>
+                            <th rowspan="2" class="text-center">Hasil</th>
+                            <th rowspan="2" class="text-center">Aksi</th>
+                        </tr>
+                        <tr>
+                            <?php 
+                            $jumlah_data = 8;
+                            for($i=1; $i<= $jumlah_data; $i++): ?>
+                                <th><?= $i ?></th>
+                            <?php endfor; ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -47,7 +64,8 @@ $icons = (new ActionColumn())->icons;
                         foreach ($jenisBarang as $_ => $barang) {
                             $penjualan = PrediksiPenjualan::find()->joinWith(['jenisBarangHasPrediksiPenjualans'])->select('tahun_bulan_id, prediksi_penjualan.id, prediksi_penjualan.hasil_prediksi')->distinct()->where(['jenis_barang_has_prediksi_penjualan.jenis_barang_id' => $barang->id])->orderBy(['tahun_bulan_id' => SORT_ASC])->all();
                             $jumlahPenjualan = null;
-                            if($penjualan != null){
+                            
+                        if($penjualan != null){
                         ?>
 
                         <tr>
@@ -58,7 +76,7 @@ $icons = (new ActionColumn())->icons;
 
                         <?php
                             foreach ($penjualan as $_ => $p) {
-                                $jumlahPenjualan = JenisBarangHasPrediksiPenjualan::find()->joinWith(['prediksiPenjualan'])->where(['jenis_barang_id' => $barang->id, 'prediksi_penjualan_id' => $p->id])->orderBy(['prediksi_penjualan.tahun_bulan_id' => SORT_ASC])->all();
+                                $jumlahPenjualan = JenisBarangHasPrediksiPenjualan::find()->joinWith(['prediksiPenjualan'])->where(['jenis_barang_id' => $barang->id, 'prediksi_penjualan_id' => $p->id])->orderBy(['id' => SORT_ASC])->all();
                             ?>
                             <tr>
                                 <td>
@@ -72,28 +90,16 @@ $icons = (new ActionColumn())->icons;
                                                                     ]) ?>
                                 </td>
 
-                                <td class="p-0">
-                                    <table class="table table-bordered mb-0">
-                                        <?php
-                                        foreach ($jumlahPenjualan as $_ => $jp) {    
-                                        ?>
-                                            <tr>
-                                                <td><?= $jp->jumlah_penjualan ?></td>
-                                                <td width="4%">
-                                                    <?= Html::a($icons['trash'], ['prediksi-penjualan/delete-jumlah-penjualan','id' => $jp->id], ['data' => [
-                                                                            'method' => 'post',
-                                                                            'confirm' => 'Are you sure you want to delete this item?',
-                                                                        ]
-                                                                    ]) ?>
-                                                </td>
-                                            </tr>
-                                        <?php 
-                                            } 
-                                        ?>
-                                    </table>
-                                </td>
-                                <td class="text-center">
-                                            <?= $p->hasil_prediksi ?>
+                                <?php
+                                foreach ($jumlahPenjualan as $_ => $jp) {    
+                                ?>
+                                        <td><?= $jp->jumlah_penjualan ?></td>
+                                <?php 
+                                    } 
+                                ?>
+                                <td><?= $p->hasil_prediksi ?></td>
+                                <td>
+                                    <?= Html::a('Detail',['view', 'id' => $p->id], ['class' => 'btn btn-sm btn-info']) ?>
                                 </td>
                             </tr>
                                     
@@ -104,7 +110,7 @@ $icons = (new ActionColumn())->icons;
                             }else{
                                 ?>
                                         <tr>
-                                            <td class="text-center" colspan="4">
+                                            <td class="text-center" colspan="12">
                                                 <i class="text-muted">Data tidak ditemukan</i>
                                             </td>
                                         </tr>
@@ -117,7 +123,7 @@ $icons = (new ActionColumn())->icons;
                             ?>
         
                                 <tr>
-                                    <td class="text-center" colspan="5">
+                                    <td class="text-center" colspan="12">
                                         <i class="text-muted">Data tidak ditemukan</i>
                                     </td>
                                 </tr>
@@ -132,3 +138,34 @@ $icons = (new ActionColumn())->icons;
     </div>
 
 </div>
+
+
+
+<?php 
+Modal::begin([
+    'options' => ['id' => 'upload'],
+    'header' => '<h4>Upload Data</h4>',
+]);
+    $form = ActiveForm::begin(['action' => ['upload'], 'options' => [ 'enctype' => 'multipart/form-data']]);
+?>
+    <div class="form-group">
+        <?= $form->field($modelJenisBarangHasPenjualan, 'jenis_barang_id')->widget(Select2::class,[
+            'data' => ArrayHelper::map(JenisBarang::find()->all(), 'id', 'jenis_barang'),
+            'options' => [
+                'name' => 'jenis_barang_id',
+                'placeholder' => 'Pilih jenis barang ...',
+            ],
+        ]); ?>
+    </div>
+
+    <div class="form-group">
+        <?= Html::fileInput('file_data', null, ['class' => 'form-control', 'accept' => '.xlsx, .xls']); ?>
+    </div>
+
+    <div class="form-group">
+        <?= Html::submitButton('Simpan',['class' => 'btn btn-primary']) ?>
+    </div>
+
+<?php
+    ActiveForm::end();
+Modal::end();

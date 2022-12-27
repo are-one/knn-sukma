@@ -58,7 +58,7 @@ use yii\helpers\ArrayHelper;
         </div>
 
         <div class="row">
-            <?php for($i = 0; $i < 10; $i++){ ?>
+            <?php for($i = 0; $i < 8; $i++){ ?>
                 <div class="form-group col-sm-4">
                     <?= $form->field($modelJenisBarangHasPenjualan, "jumlah_penjualan[{$i}]", [
                         'options' => ['class' => 'col-3 mb-3']

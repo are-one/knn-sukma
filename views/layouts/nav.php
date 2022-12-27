@@ -65,7 +65,16 @@ use yii\helpers\Html;
                 <?= Html::a('<i class="fa fa-tasks nav_icon"></i> Data Training', ['penjualan/index']) ?>
               </li>
               <li>
-                <?= Html::a('<i class="fa fa-spinner nav_icon"></i> Klasifikasi / Prediksi', ['prediksi-penjualan/index']) ?>
+                <?= Html::a('<i class="fa fa-spinner nav_icon"></i> Data Testing', ['prediksi-penjualan/index']) ?>
+              </li>
+              <li class="nav-item"><?=
+                    Html::beginForm(['/site/logout'])
+                    . Html::submitButton(
+                        'Logout (' . Yii::$app->user->identity->username . ')',
+                        ['class' => 'nav-link btn btn-link logout']
+                    )
+                    . Html::endForm()
+                    ?>
               </li>
             </ul>
           </div>

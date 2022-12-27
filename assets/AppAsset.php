@@ -30,7 +30,7 @@ class AppAsset extends AssetBundle
     ];
     public $js = [
         // 'template/js/jquery.min.js',
-        'template/js/bootstrap.min.js',
+        // 'template/js/bootstrap.min.js',
         'template/js/metisMenu.min.js',
         'template/js/custom.js',
         'template/js/d3.v3.js',
@@ -38,7 +38,7 @@ class AppAsset extends AssetBundle
     ];
     public $depends = [
         'yii\web\YiiAsset',
-        'yii\bootstrap\BootstrapAsset',
+        // 'yii\bootstrap\BootstrapAsset',
         // 'app\assets\SecondAppAsset'
     ];
 }

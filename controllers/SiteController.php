@@ -9,6 +9,7 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\JenisBarang;
 use app\models\User;
 use Phpml\Classification\KNearestNeighbors;
 use Phpml\Math\Distance\Euclidean;
@@ -29,7 +30,7 @@ class SiteController extends Controller
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'hasil-survey'],
+                        'actions' => ['logout', 'index', 'hasil'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -146,4 +147,13 @@ class SiteController extends Controller
     //         print_r($model->getErrors());
     //     }
     // }
+
+    public function actionHasil()
+    {
+        $jenisBarang = JenisBarang::find()->all();
+
+        return $this->render('hasil',[
+            'jenisBarang' => $jenisBarang,
+        ]);
+    }
 }
